@@ -1,0 +1,147 @@
+{
+  "name": "webhook file chatbox",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bd1cef8f-e9e9-471d-89a8-fad78ba4682e",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -416,
+        -96
+      ],
+      "id": "6430069a-daba-4185-b796-7373f4afb228",
+      "name": "Webhook",
+      "webhookId": "bd1cef8f-e9e9-471d-89a8-fad78ba4682e"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "files",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -192,
+        -96
+      ],
+      "id": "17c309e6-5efe-4d71-894e-17f46d5e97a8",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Read the following resume and create a concise professional summary highlighting the candidate's key skills, experience, expertise, education, certifications, and achievements.\n\nResume:\n{{ $json.text }}",
+        "options": {
+          "systemMessage": "You are an expert resume analyzer. Summarize the provided resume using only the information given. Do not invent or assume any details. Return only one professional paragraph of 100–150 words."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        48,
+        -96
+      ],
+      "id": "a9e99554-9a55-401f-8f31-29874ce5f214",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openrouter/free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        48,
+        112
+      ],
+      "id": "77689f0e-e143-4282-8a4f-0c9cfd239c21",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "4qt0ap6NYYYs4inA",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        368,
+        -96
+      ],
+      "id": "870cc5d1-20b4-47c7-af6b-4fdf8debc902",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "13aed31e-1a44-42d9-841f-5220232ddd1b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d59d320f7ba35d59453fde7f1ca1450765280ada1ce94105fb29150157d8d758"
+  },
+  "nodeGroups": [],
+  "id": "ejVdkmUIHOh59FOo",
+  "tags": []
+}
